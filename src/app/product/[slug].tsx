@@ -1,5 +1,5 @@
 import { Redirect, Stack, useLocalSearchParams } from 'expo-router'
-import { FlatList, Image, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useToast } from 'react-native-toast-notifications';
 import { PRODUCTS } from '../../../assets/products';
 import { useCartStore } from '../../store/cart-store';
@@ -12,19 +12,57 @@ const ProductDetails = () => {
 
     if (!product) return <Redirect href='/404' />
 
-    const {items, addItem, incrementItem, decrementItem} = useCartStore();
+    const { items, addItem } = useCartStore();
 
     const cartItem = items.find(item => item.id === product.id);
+    // console.log("The Cart Item: ", cartItem)
 
-    const initialQuantity = cartItem ? cartItem.quantity : 1;
+    const initialQuantity = cartItem ? cartItem.quantity : 0;
 
-    const [quantity, setQuantity] = useState(initialQuantity);
+    const [quantity, setQuantity] = useState(1);
 
-    const increaseQuantity = () => {}
+    const increaseQuantity = () => {
+      if ((quantity + initialQuantity) < product.maxQuantity) {
+        setQuantity(prev => prev + 1)
+      } else {
+        toast.show("Cannot add more than maximum quantity", {
+          type: 'warning',
+          placement: 'top',
+          duration: 1500
+        })
+      }
+    }
 
-    const decreaseQuantity = () => {}
+    const decreaseQuantity = () => {
+      if (quantity > 1) {
+        setQuantity(prev => prev - 1)
+      }
+    }
 
-    const addToCart = () => {}
+    const addToCart = () => {
+      if ((quantity + initialQuantity) <= product.maxQuantity) {
+        addItem({
+          id: product.id,
+          title: product.title,
+          image: product.heroImage,
+          price: product.price,
+          quantity: quantity,
+        });
+        toast.show("Added to cart", {
+          type: 'success',
+          placement: 'top',
+          duration: 1500
+        });
+        // incrementItem(product.id, quantity)
+      } else {
+        toast.show("Maximum item quantity Exceeded", {
+          type: 'warning',
+          placement: 'top',
+          duration: 1500
+        });
+      }
+      setQuantity(1)
+    }
 
     const totalPrice = (product.price * quantity).toFixed(2);
 
@@ -35,7 +73,7 @@ const ProductDetails = () => {
         source={product.heroImage}
         style={styles.heroImage}
       />
-      <View style={styles.productFirstView}>
+      <View style={styles.subContainer}>
         <Text style={styles.title}>Title: {product.title}</Text>
         <Text style={styles.slug}>slug: {product.slug}</Text>
         <View style={styles.priceContainer}>
@@ -53,6 +91,37 @@ const ProductDetails = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.imagesContainer}
         />
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.quantityButton}
+            onPress={decreaseQuantity}
+            disabled={quantity <= 1}
+          >
+            <Text style={styles.quantityButtonText}>-</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.quantity}>{quantity}</Text>
+
+          <TouchableOpacity
+            style={styles.quantityButton}
+            onPress={increaseQuantity}
+            disabled={quantity >= product.maxQuantity}
+          >
+            <Text style={styles.quantityButtonText}>+</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.addToCartButton,
+              {opacity: quantity === 0 ? 0.5 : 1}
+            ]}
+            onPress={addToCart}
+            disabled={quantity === 0}
+          >
+            <Text style={styles.addToCartText}>Add to Cart</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )
@@ -65,7 +134,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  productFirstView: {
+  subContainer: {
     padding: 18,
     flex: 1
   },
