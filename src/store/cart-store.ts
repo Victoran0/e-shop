@@ -13,7 +13,7 @@ type CartState = {
     items: CartItemType[];
     addItem: (item: CartItemType) => void;
     removeItem: (id: number) => void;
-    incrementItem: (id: number) => void;
+    incrementItem: (id: number, qty: number) => void;
     decrementItem: (id: number) => void;
     getTotalPrice: () => string;
     getItemCount: () => number;
@@ -40,15 +40,15 @@ export const useCartStore = create<CartState>((set, get) => ({
         }
     },
     removeItem: (id: number) => set(state => ({items: state.items.filter(item => item.id !== id)})),
-    incrementItem: (id: number) => set(state => {
+    incrementItem: (id: number, qty: number) => set(state => {
         const product = PRODUCTS.find(p => p.id === id);
 
         if (!product) return state
 
         return {
             items: state.items.map(item => 
-                item.id === id && item.quantity < product.maxQuantity
-                ? {...item, quantity: item.quantity + 1} 
+                item.id === id && (item.quantity + qty) < product.maxQuantity
+                ? {...item, quantity: item.quantity + qty} 
                 : item
             )
         }
