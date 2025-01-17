@@ -1,4 +1,4 @@
-import { Link } from 'expo-router'
+import { Link, Redirect } from 'expo-router'
 import { FlatList, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import {FontAwesome} from '@expo/vector-icons'
 import { CATEGORIES } from '../../assets/categories'
@@ -41,9 +41,11 @@ export const ListHeader = () => {
                             )}
                         </Pressable>
                     </Link>
+                    <Link href='/auth' asChild>
                     <TouchableOpacity style={styles.signOutButton}>
                         <FontAwesome name='sign-out' size={25} color='red' />
                     </TouchableOpacity>
+                    </Link>
                 </View>
             </View>
             <View style={styles.heroContainer}>
