@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity} from 'react-native'
+import {View, Text, StyleSheet, Keyboard, ImageBackground, TextInput, TouchableOpacity, TouchableWithoutFeedback} from 'react-native'
 import {useForm, Controller} from 'react-hook-form'
 import * as zod from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
@@ -46,6 +46,7 @@ export default function Auth() {
             style={styles.backgroundImage}
         >
             <View style={styles.overlay} />
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View style={styles.container}>
                 <Text style={styles.title}>Welcome</Text>
                 <Text style={styles.subtitle}>
@@ -112,6 +113,7 @@ export default function Auth() {
                     <Text style={styles.buttonText}>Sign Up</Text>
                 </TouchableOpacity>
             </View>
+            </TouchableWithoutFeedback>
         </ImageBackground>
     )
 }
